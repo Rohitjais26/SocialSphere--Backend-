@@ -28,7 +28,7 @@ const instacloneAuth = async (req, res) => {
 
     // 4. Return the client-side redirect URL to the frontend.
     // The frontend will receive this URL and navigate to it to skip the external OAuth process.
-    const redirectUrl = `http://localhost:5173/connect?status=success&platform=instaclone`; 
+    const redirectUrl = `${process.env.CLIENT_URL}/connect?status=success&platform=instaclone`;
     
     return res.status(200).json({
       message: "InstaClone account connected successfully!",
