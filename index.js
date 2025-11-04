@@ -36,6 +36,11 @@ app.use('/api/social', socialAuthRoutes); // Add the new social auth routes
 // Start the scheduler
 startScheduler();
 
+// Default route for testing (Render root URL)
+app.get("/", (req, res) => {
+  res.send("✅ SocialSphere Backend API is running successfully!");
+});
+
 // --- Server Setup ---
 const PORT = process.env.PORT || 4000;
 
