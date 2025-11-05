@@ -12,7 +12,7 @@ const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists (handles E11000 duplicate key error)
+    // Check if user exists
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
 

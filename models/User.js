@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Encrypt password before saving (REMOVED HOOK - HASHING IS NOW IN THE CONTROLLER)
+// Encrypt password before saving (REMOVED HOOK - HASHING IS NOW HANDLED BY THE CONTROLLER)
 /*
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
