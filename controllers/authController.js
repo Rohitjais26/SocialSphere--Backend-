@@ -16,9 +16,15 @@ const register = async (req, res) => {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
 
-    // Create new user
-    user = new User({ name, email, password });
+    // --- FIX 1: HASH PASSWORD EXPLICITLY IN CONTROLLER ---
+    // This resolves the crash/stability issue encountered in the middleware.
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Create new user using the HASHED password
+    user = new User({ name, email, password: hashedPassword });
     await user.save();
+    // ----------------------------------------------------
 
     const token = generateToken(user.id);
 
@@ -31,7 +37,7 @@ const register = async (req, res) => {
       },
     });
   } catch (err) {
-    // FIX: Catch specific Mongoose errors (like ValidationError from schema minlength)
+    // FIX 2: Catch specific Mongoose errors (like ValidationError from schema minlength)
     console.error("Registration failed:", err.name, err.message);
     
     if (err.name === 'ValidationError') {

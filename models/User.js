@@ -50,20 +50,21 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Encrypt password before saving (UPDATED WITH TRY/CATCH BLOCK)
+// Encrypt password before saving (REMOVED HOOK - HASHING IS NOW IN THE CONTROLLER)
+/*
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   
-  try { // CRITICAL FIX: Ensures server doesn't crash if bcrypt fails
+  try { 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
     console.error("Bcrypt pre-save middleware failed:", error);
-    // Pass the error up the chain so Mongoose/Express can handle it
     next(error); 
   }
 });
+*/
 
 // Match entered password with hashed password
 UserSchema.methods.matchPassword = async function (enteredPassword) {
