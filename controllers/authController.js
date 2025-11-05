@@ -12,9 +12,9 @@ const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists
+    // Check if user exists (handles E11000 duplicate key error)
     let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: "User already exists" });
+    if (user) return res.status(400).json({ message: "User already exists" });
 
     // Create new user
     user = new User({ name, email, password });
@@ -31,8 +31,16 @@ const register = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+    // FIX: Catch specific Mongoose errors (like ValidationError from schema minlength)
+    console.error("Registration failed:", err.name, err.message);
+    
+    if (err.name === 'ValidationError') {
+        // Send 400 Bad Request with the specific Mongoose validation message
+        return res.status(400).json({ message: err.message });
+    }
+    
+    // Fallback for other server errors (e.g., connection issue, unknown crash)
+    res.status(500).json({ message: "Server error during registration." });
   }
 };
 
@@ -43,10 +51,10 @@ const login = async (req, res) => {
 
     // Explicitly select password (since schema has select: false)
     const user = await User.findOne({ email }).select("+password");
-    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = generateToken(user.id);
 
@@ -60,7 +68,7 @@ const login = async (req, res) => {
     });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ message: "Server error during login." });
   }
 };
 
